@@ -101,6 +101,7 @@ async def send_traffic_info():
             for key_word in key_words:
                 if key_word in data.text:
                     key_word_found = True
+                    print(data.text)
                     break
             if key_word_found:
                 while True:
