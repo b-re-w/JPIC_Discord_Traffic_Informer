@@ -23,15 +23,19 @@ latest_log_msg = {}
 
 key_words = ['시위', '집회', '행진']
 
+initial_with_index = True
+
 
 def init_twitter_api():
     """ Initialize user id must be twitter user number.
         user number can be found at https://tweeterid.com/ by user name.
     """
     # @seoultopis => 124409615
-    UserTweet(124409615, "seoultopis", "서울시 교통정보과", TwitterEnv.bearer_token)
+    UserTweet(124409615, "seoultopis", "서울시 교통정보과", 0x62c1cc, TwitterEnv.bearer_token,
+              "https://pbs.twimg.com/profile_images/1544937894/php0GXgQC_400x400")
     # @poltraffic02 => 1449898601899986946
-    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", TwitterEnv.bearer_token)
+    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", 0x5cc4e8, TwitterEnv.bearer_token,
+              "https://pbs.twimg.com/profile_images/1451428633164193802/qV1vNOSe_400x400.jpg")
 
 
 init_twitter_api()
@@ -59,7 +63,11 @@ async def on_ready():
             break
     if not latest_log_msg:
         print("Log channel history not found. Initializing...")
-        await log_channel.send("Initializing...")
+        if initial_with_index:
+            for tag, t_user in UserTweet.user_list.items():
+                latest_log_msg[tag] = input(f"Please enter initial tweet index for {t_user.name} : ")
+        else:  # auto initialization
+            await log_channel.send("Initializing...")
     else:
         # ex: seoultopis=1531766718456274947,poltraffic02=1531766718456274947
         print("Log channel history found.")

@@ -11,11 +11,12 @@ import discord
 class UserTweet(object):
     user_list = {}
 
-    def __init__(self, user_id, user_tag, user_name, bearer_token):
+    def __init__(self, user_id, user_tag, user_name, color, bearer_token, photo):
         self.user_id = user_id
         self.user_tag = user_tag
         self.user_name = user_name
-        self.photo_url = f"https://twitter.com/{user_tag}/photo"
+        self.color = color
+        self.photo_url = photo
         self.bearer_token = bearer_token
         self.user_list[user_tag] = self
 
@@ -90,11 +91,13 @@ class Tweet(dict):
 
     @property
     def to_discord_embed(self):
-        embed = discord.Embed(title=self.user.user_name, description=self.created_at,
-                              timestamp=datetime.now(pytz.timezone('UTC')), color=0x00ff00)
-        embed.add_field(name="Info", value=self.text, inline=False)
+        embed = discord.Embed(title="A New Traffic Information Received.",
+                              description="* press embed profile to go original post.",
+                              timestamp=datetime.now(pytz.timezone('UTC')), color=self.user.color)
+        embed.add_field(name=self.created_at, value=self.text, inline=False)
+        embed.set_author(name=self.user.user_name, url=self.original_url, icon_url=self.user.photo_url)
         embed.set_footer(text=self.original_url, icon_url=self.user.photo_url)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/955360993729449987/955392404280737812/99pk9saw36t7q8t3o0gt.jpg")
+        embed.set_thumbnail(url=self.original_url)
         return embed
 
 
