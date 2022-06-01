@@ -65,7 +65,8 @@ async def on_ready():
         print("Log channel history not found. Initializing...")
         if initial_with_index:
             for tag, t_user in UserTweet.user_list.items():
-                latest_log_msg[tag] = input(f"Please enter initial tweet index for {t_user.user_name} : ")
+                latest_log_msg[tag] = \
+                    f"{int(input(f'Please enter initial tweet index for {t_user.user_name} : '))-1}"
         else:  # auto initialization
             await log_channel.send("Initializing...")
     else:
