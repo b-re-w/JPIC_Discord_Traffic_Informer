@@ -45,8 +45,6 @@ class UserTweet(object):
             params['max_results'] = max_tweets
         if since_id:
             params['since_id'] = since_id
-            if 'max_results' in params:
-                del params['max_results']
         return params
 
     def bearer_oauth(self, r):

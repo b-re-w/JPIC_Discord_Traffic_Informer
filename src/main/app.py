@@ -76,8 +76,8 @@ async def send_traffic_info():
     for tag, t_user in UserTweet.user_list.items():
         since_id = latest_log_msg.get(tag, None)
         if since_id:
-            since_id = f"{int(since_id) + 1}
-        params = t_user.get_params(since_id=since_id)
+            since_id = f"{int(since_id) + 1}"
+        params = t_user.get_params(max_tweets=1000, since_id=since_id)
         try:
             meta, datas = t_user.connect_to_endpoint(params)
         except KeyError:
