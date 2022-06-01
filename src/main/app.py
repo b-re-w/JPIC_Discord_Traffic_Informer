@@ -54,6 +54,7 @@ async def on_ready():
     async for message in log_channel.history(limit=200):
         if message.author == bot.user:
             latest_log_msg = message
+            break
     if not latest_log_msg:
         print("Log channel history not found. Initializing...")
         await log_channel.send("Initializing...")
@@ -80,6 +81,7 @@ async def send_traffic_info():
         params = t_user.get_params(max_tweets=100, since_id=since_id)
         try:
             meta, datas = t_user.connect_to_endpoint(params)
+            print(meta)
         except KeyError:
             continue
         for data in datas:
