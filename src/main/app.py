@@ -9,6 +9,8 @@ Reference : [twitter] https://hleecaster.com/python-twitter-api/
             [discord] https://luran.me/521
                       https://cosmosproject.tistory.com/482
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+from datetime import datetime
+
 from settings import TwitterEnv, DiscordEnv
 
 from api.user_tweets import UserTweet
@@ -81,8 +83,9 @@ async def send_traffic_info():
         params = t_user.get_params(max_tweets=100, since_id=since_id)
         try:
             meta, datas = t_user.connect_to_endpoint(params)
-            print(meta)
+            print(f"[{datetime.now()}] <{tag}> ", meta)
         except KeyError:
+            print(f"[{datetime.now()}] <{tag}> Nothing to update.")
             continue
         for data in datas:
             key_word_found = False
