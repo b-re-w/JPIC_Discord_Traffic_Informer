@@ -23,7 +23,7 @@ latest_log_msg = {}
 
 key_words = ['시위', '집회', '행진']
 
-initial_with_index = True
+initial_with_index = False
 
 
 def init_twitter_api():
@@ -34,7 +34,7 @@ def init_twitter_api():
     UserTweet(124409615, "seoultopis", "서울시 교통정보과", 0x62c1cc, TwitterEnv.bearer_token,
               "https://pbs.twimg.com/profile_images/1544937894/php0GXgQC_400x400")
     # @poltraffic02 => 1449898601899986946
-    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", 0x5cc4e8, TwitterEnv.bearer_token,
+    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", 0x718679, TwitterEnv.bearer_token,
               "https://pbs.twimg.com/profile_images/1451428633164193802/qV1vNOSe_400x400.jpg")
 
 
