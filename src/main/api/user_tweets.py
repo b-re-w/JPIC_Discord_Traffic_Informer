@@ -17,7 +17,7 @@ class UserTweet(object):
         self.user_name = user_name
         self.photo_url = f"https://twitter.com/{user_tag}/photo"
         self.bearer_token = bearer_token
-        self.user_list[user_id] = self
+        self.user_list[user_tag] = self
 
     @property
     def url(self):
