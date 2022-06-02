@@ -84,7 +84,7 @@ async def on_ready():
 @tasks.loop(minutes=1)
 async def send_traffic_info():
     send_list = {}
-    log_string = []
+    is_modified = False
     for tag, t_user in UserTweet.user_list.items():
         since_id = latest_log_msg.get(tag, None)
         if since_id:
@@ -111,12 +111,12 @@ async def send_traffic_info():
                         break
                 send_list[data.created_at] = data.to_discord_embed
                 break
-        log_string.append(meta.to_log_msg)
         latest_log_msg[tag] = meta.newest_id
+        is_modified = True
     for _, send_msg in sorted(send_list.items()):
         await channel.send(embed=send_msg)
-    if log_string:
-        await log_channel.send(",".join(log_string))
+    if is_modified:
+        await log_channel.send(",".join([f"{tag}={log}" for tag, log in latest_log_msg.items()]))
 
 
 @bot.command()
