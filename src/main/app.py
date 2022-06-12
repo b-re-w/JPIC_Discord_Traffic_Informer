@@ -96,6 +96,9 @@ async def send_traffic_info():
         except KeyError:
             print(f"[{datetime.now()}] <{tag}> Nothing to update.")
             continue
+        except Exception as e:
+            print(f"[{datetime.now()}]\n", e)
+            return
         for data in datas:
             key_word_found = False
             for key_word in key_words:
