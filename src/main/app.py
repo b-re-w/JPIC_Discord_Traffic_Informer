@@ -43,6 +43,8 @@ init_twitter_api()
 
 @bot.event
 async def on_ready():
+    global latest_log_msg
+
     print("Logged in as")
     print(bot.user.name)
     print(bot.user.id)
@@ -83,6 +85,9 @@ async def on_ready():
 
 @tasks.loop(minutes=1)
 async def send_traffic_info():
+    global latest_log_msg
+    current_log_msg = {}
+
     send_list = {}
     is_modified = False
     for tag, t_user in UserTweet.user_list.items():
@@ -114,12 +119,14 @@ async def send_traffic_info():
                         break
                 send_list[data.created_at] = data.to_discord_embed
                 break
-        latest_log_msg[tag] = meta.newest_id
+        current_log_msg[tag] = meta.newest_id
         is_modified = True
     for _, send_msg in sorted(send_list.items()):
         await channel.send(embed=send_msg)
     if is_modified:
-        await log_channel.send(",".join([f"{tag}={log}" for tag, log in latest_log_msg.items()]))
+        if latest_log_msg != current_log_msg:
+            await log_channel.send(",".join([f"{tag}={log}" for tag, log in current_log_msg.items()]))
+            latest_log_msg = current_log_msg
 
 
 @bot.command()
