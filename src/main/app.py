@@ -86,7 +86,7 @@ async def on_ready():
 @tasks.loop(minutes=1)
 async def send_traffic_info():
     global latest_log_msg
-    current_log_msg = {}
+    current_log_msg = {key: val for key, val in latest_log_msg.items()}
 
     send_list = {}
     is_modified = False
