@@ -10,6 +10,7 @@ Reference : [twitter] https://hleecaster.com/python-twitter-api/
                       https://cosmosproject.tistory.com/482
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 from datetime import datetime
+from flask import Flask
 
 from settings import TwitterEnv, DiscordEnv
 
@@ -134,5 +135,14 @@ async def ping(ctx):
     await ctx.send("pong")
 
 
+bot.run(DiscordEnv.token)
+app = Flask(__name__)
+
+
+@app.route('/')
+def hello_world():  # put application's code here
+    return "Hello World!"
+
+
 if __name__ == '__main__':
-    bot.run(DiscordEnv.token)
+    app.run(host='0.0.0.0', port=80)
