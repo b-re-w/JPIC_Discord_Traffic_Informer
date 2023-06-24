@@ -112,7 +112,7 @@ async def send_traffic_info():
             since_id = f"{int(since_id) + 1}"
 
         try:
-            datas, meta = t_user.lookup_tweets(max_tweets=100, since_id=since_id)
+            datas, meta = t_user.lookup_tweets(max_tweets=100, since_tweet_id=since_id)
             if datas:
                 print(f"[{datetime.now()}] <{tag}> ", meta)
                 for data in datas:
