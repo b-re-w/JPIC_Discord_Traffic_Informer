@@ -11,6 +11,7 @@ Reference : [twitter] https://hleecaster.com/python-twitter-api/
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 from datetime import datetime
 from flask import Flask
+import traceback
 import pytz
 
 import discord
@@ -52,7 +53,8 @@ def to_discord_embed(user, twt_data):
     embed.add_field(name=twt_data.date, value=twt_data.rawContent, inline=False)
     embed.set_author(name=user.user_name, url=twt_data.url, icon_url=user.photo_url)
     embed.set_footer(text=twt_data.url, icon_url=user.photo_url)
-    [embed.set_image(url=media.fullUrl) for media in twt_data.media]
+    if twt_data.media:
+        [embed.set_image(url=media.fullUrl) for media in twt_data.media]
     embed.set_thumbnail(url=twt_data.url)
     return embed
 
@@ -116,27 +118,19 @@ async def send_traffic_info():
             if datas:
                 print(f"[{datetime.now()}] <{tag}> ", meta)
                 for data in datas:
-                    key_word_found = False
                     for key_word in key_words:
                         if key_word in data.rawContent:
-                            key_word_found = True
+                            send_list[data.date] = to_discord_embed(t_user, data)
                             print(data.rawContent)
                             break
-                    if key_word_found:
-                        while True:
-                            if tag in send_list:
-                                tag = tag + '_'
-                            else:
-                                break
-                        send_list[data.date] = to_discord_embed(t_user, data)
-                        break
                 current_log_msg[tag] = meta['newest_id']
                 is_modified = True
             else:
                 print(f"[{datetime.now()}] <{tag}> Nothing to update.")
                 continue
-        except Exception as e:
-            print(f"[{datetime.now()}]\n", e)
+        except Exception:
+            print(f"[{datetime.now()}]")
+            traceback.print_exc()
             return
 
     for _, send_msg in sorted(send_list.items()):
