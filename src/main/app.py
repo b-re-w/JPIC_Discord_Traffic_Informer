@@ -3,17 +3,16 @@
 ### Alias : app & Last Modded : 2023.06.24. ###
 Coded with Python 3.10 Grammar by irack000
 Description : Application Main
-Reference : [twitter] https://hleecaster.com/python-twitter-api/
-                      https://velog.io/@kjyeon1101/%ED%8A%B8%EC%9C%84%ED%84%B0-API-%ED%81%AC%EB%A1%A4%EB%A7%81%ED%95%98%EA%B8%B0
-            [twitter api 2.0] https://github.com/twitterdev/Twitter-API-v2-sample-code
-            [discord] https://luran.me/521
+Reference : [discord] https://luran.me/521
                       https://cosmosproject.tistory.com/482
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 from datetime import datetime
-from flask import Flask
 import traceback
-import pytz
 
+from pytz import timezone
+KST = timezone('Asia/Seoul')
+
+from flask import Flask
 import discord
 from discord.ext import commands, tasks
 intents = discord.Intents.default()
@@ -50,7 +49,7 @@ def to_discord_embed(user, twt_data):
     embed = discord.Embed(title="A New Traffic Information Received.",
                           description="* press embed profile to go original post.",
                           timestamp=twt_data.date, color=user.color)
-    embed.add_field(name=twt_data.date, value=twt_data.rawContent, inline=False)
+    embed.add_field(name=twt_data.date.astimezone(KST), value=twt_data.rawContent, inline=False)
     embed.set_author(name=user.user_name, url=twt_data.url, icon_url=user.photo_url)
     embed.set_footer(text=twt_data.url, icon_url=user.photo_url)
     if twt_data.media:
@@ -77,7 +76,7 @@ async def on_ready():
 
     # Check Log Channel history
     global latest_log_msg
-    async for message in log_channel.history(limit=200):
+    async for message in log_channel.history(limit=1000):
         if message.author == bot.user:
             latest_log_msg = message
             break
