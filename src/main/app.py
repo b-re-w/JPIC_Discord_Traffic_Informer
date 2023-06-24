@@ -15,12 +15,15 @@ import pytz
 
 import discord
 from discord.ext import commands, tasks
+intents = discord.Intents.default()
+intents.typing = False
+intents.presences = False
 
 from settings import DiscordEnv
 from api.user_tweets import UserTweet
 
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', intents=intents)
 channel = None
 log_channel = None
 latest_log_msg = {}
