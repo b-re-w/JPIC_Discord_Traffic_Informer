@@ -4,8 +4,8 @@ from snscrape.modules.twitter import TwitterUserScraper
 class UserTweet(TwitterUserScraper):
     user_list = {}
 
-    def __init__(self, user_id, user_tag, user_name, color, photo, user):
-        super().__init__(user)
+    def __init__(self, user_id, user_tag, user_name, color, photo):
+        super().__init__(user_tag)
         self.user_id = user_id
         self.user_tag = user_tag
         self.user_name = user_name
