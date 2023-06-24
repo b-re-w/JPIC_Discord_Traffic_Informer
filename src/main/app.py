@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-### Alias : app & Last Modded : 2022.05.31. ###
+### Alias : app & Last Modded : 2023.06.24. ###
 Coded with Python 3.10 Grammar by irack000
 Description : Application Main
 Reference : [twitter] https://hleecaster.com/python-twitter-api/
@@ -11,11 +11,14 @@ Reference : [twitter] https://hleecaster.com/python-twitter-api/
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 from datetime import datetime
 from flask import Flask
+import pytz
 
-from settings import TwitterEnv, DiscordEnv
-
-from api.user_tweets import UserTweet
+import discord
 from discord.ext import commands, tasks
+
+from settings import DiscordEnv
+from api.user_tweets import UserTweet
+
 
 bot = commands.Bot(command_prefix='!')
 channel = None
@@ -32,14 +35,23 @@ def init_twitter_api():
         user number can be found at https://tweeterid.com/ by user name.
     """
     # @seoultopis => 124409615
-    UserTweet(124409615, "seoultopis", "서울시 교통정보과", 0x62c1cc, TwitterEnv.bearer_token,
+    UserTweet(124409615, "seoultopis", "서울시 교통정보과", 0x62c1cc,
               "https://pbs.twimg.com/profile_images/1544937894/php0GXgQC_400x400")
     # @poltraffic02 => 1449898601899986946
-    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", 0x718679, TwitterEnv.bearer_token,
+    UserTweet(1449898601899986946, "poltraffic02", "서울경찰청 종합교통정보센터", 0x718679,
               "https://pbs.twimg.com/profile_images/1451428633164193802/qV1vNOSe_400x400.jpg")
 
 
-init_twitter_api()
+def to_discord_embed(user, twt_data):
+    embed = discord.Embed(title="A New Traffic Information Received.",
+                          description="* press embed profile to go original post.",
+                          timestamp=twt_data.date, color=user.color)
+    embed.add_field(name=twt_data.date, value=twt_data.rawContent, inline=False)
+    embed.set_author(name=user.user_name, url=twt_data.url, icon_url=user.photo_url)
+    embed.set_footer(text=twt_data.url, icon_url=user.photo_url)
+    [embed.set_image(url=media.fullUrl) for media in twt_data.media]
+    embed.set_thumbnail(url=twt_data.url)
+    return embed
 
 
 @bot.event
@@ -95,33 +107,35 @@ async def send_traffic_info():
         since_id = latest_log_msg.get(tag, None)
         if since_id:
             since_id = f"{int(since_id) + 1}"
-        params = t_user.get_params(max_tweets=100, since_id=since_id)
+
         try:
-            meta, datas = t_user.connect_to_endpoint(params)
-            print(f"[{datetime.now()}] <{tag}> ", meta)
-        except KeyError:
-            print(f"[{datetime.now()}] <{tag}> Nothing to update.")
-            continue
+            datas, meta = t_user.lookup_tweets(max_tweets=100, since_id=since_id)
+            if datas:
+                print(f"[{datetime.now()}] <{tag}> ", meta)
+                for data in datas:
+                    key_word_found = False
+                    for key_word in key_words:
+                        if key_word in data.rawContent:
+                            key_word_found = True
+                            print(data.rawContent)
+                            break
+                    if key_word_found:
+                        while True:
+                            if tag in send_list:
+                                tag = tag + '_'
+                            else:
+                                break
+                        send_list[data.date] = to_discord_embed(t_user, data)
+                        break
+                current_log_msg[tag] = meta['newest_id']
+                is_modified = True
+            else:
+                print(f"[{datetime.now()}] <{tag}> Nothing to update.")
+                continue
         except Exception as e:
             print(f"[{datetime.now()}]\n", e)
             return
-        for data in datas:
-            key_word_found = False
-            for key_word in key_words:
-                if key_word in data.text:
-                    key_word_found = True
-                    print(data.text)
-                    break
-            if key_word_found:
-                while True:
-                    if tag in send_list:
-                        tag = tag + '_'
-                    else:
-                        break
-                send_list[data.created_at] = data.to_discord_embed
-                break
-        current_log_msg[tag] = meta.newest_id
-        is_modified = True
+
     for _, send_msg in sorted(send_list.items()):
         await channel.send(embed=send_msg)
     if is_modified:
@@ -135,6 +149,7 @@ async def ping(ctx):
     await ctx.send("pong")
 
 
+init_twitter_api()
 bot.run(DiscordEnv.token)
 app = Flask(__name__)
 
